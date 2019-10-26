@@ -4,6 +4,8 @@ import { withNavigation } from 'react-navigation';
 import * as Location from 'expo-location';
 import * as BackgroundFetch from 'expo-background-fetch';
 import * as Permissions from 'expo-permissions';
+import * as TaskManager from 'expo-task-manager';
+
 
 
 import {
@@ -23,9 +25,6 @@ import { MonoText } from '../components/StyledText';
 import { FlatList } from 'react-native-gesture-handler';
 
 
-const LOCATION_TASK_NAME = 'background-location-task';
-
-
 function Item({ title, text, username }) {
   let name;
   url = Object.values({ username }).toString();
@@ -40,6 +39,19 @@ function Item({ title, text, username }) {
       </View>
     )
 }
+
+const BACKGROUND_LOCATION_SENDING_TASK = "BACKGROUND_LOCATION_SENDING_TASK";
+
+TaskManager.defineTask(BACKGROUND_LOCATION_SENDING_TASK, () => {
+  try {
+    const updatedLocation = this.state.location;// do your background fetch here
+    return receivedNewData ? BackgroundFetch.Result.NewData : BackgroundFetch.Result.NoData;
+  } catch (error) {
+    return BackgroundFetch.Result.Failed;
+  }
+});
+
+
 
 class HomeScreen extends React.Component {
   static navigationOptions = {
