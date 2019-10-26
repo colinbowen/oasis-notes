@@ -46,10 +46,7 @@ class CreateNoteScreen extends React.Component {
     )}
 
     _createNote = async () => {
-      const username = await AsyncStorage.getItem('username');
-      const user_url = await AsyncStorage.getItem('user_url') + '/';
-
-      console.log(user_url);
+      const user_url = await AsyncStorage.getItem('user_url');
 
       let note = {
         'title': this.state.title, 
@@ -62,6 +59,7 @@ class CreateNoteScreen extends React.Component {
       const userToken = await AsyncStorage.getItem('userToken');
       let token = 'Token ' + userToken;
 
+      console.log(note);
       try {
         const response = await fetch(url, {
           method: 'POST',
@@ -78,6 +76,8 @@ class CreateNoteScreen extends React.Component {
       } catch (error) {
         console.error('Error:', error);
       }
+
+
     };
 
     clearText = () => {

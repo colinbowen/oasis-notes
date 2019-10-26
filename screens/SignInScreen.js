@@ -99,7 +99,6 @@ class SignInScreen extends React.Component {
             url = 'http://oasis-notes.herokuapp.com/rest-auth/user/'
             const userToken = await AsyncStorage.getItem('userToken');
             let token = 'Token ' + userToken;
-            console.log(token)
 
           try {
             const response_user = await fetch(url, {
@@ -110,11 +109,9 @@ class SignInScreen extends React.Component {
               }
             });
             let json_user = await response_user.json();
-            console.log('NEW USERNAME', json_user.username);
             await AsyncStorage.setItem('username', json_user.username);
             await AsyncStorage.setItem('email', json_user.email);
-            let user_url = 'http://oasis-notes.herokuapp.com/users/' + json_user.pk
-            console.log(user_url);
+            let user_url = 'http://oasis-notes.herokuapp.com/users/' + json_user.pk +'/'
             await AsyncStorage.setItem('user_url', user_url);
             
 

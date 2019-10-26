@@ -2,6 +2,7 @@ import * as WebBrowser from 'expo-web-browser';
 import React from 'react';
 import { withNavigation } from 'react-navigation';
 import * as Location from 'expo-location';
+import * as BackgroundFetch from 'expo-background-fetch';
 import * as Permissions from 'expo-permissions';
 
 
@@ -57,7 +58,6 @@ class HomeScreen extends React.Component {
 
 
   componentDidMount(){
-    // this._sendLocationAsync();
     return fetch('http://oasis-notes.herokuapp.com/notes/')
     .then((response) => response.json())
     .then((responseJson) => {
@@ -102,6 +102,7 @@ class HomeScreen extends React.Component {
     return (
       <View style={styles.container}>
         <Button title="Refresh Notes" onPress={this._getNotes} />
+        <Button title="Send location" onPress={this._sendLocationAsync} />
 
         <FlatList 
           data={this.state.dataSource}
@@ -125,7 +126,6 @@ class HomeScreen extends React.Component {
     this.setState({
       dataSource: responseJson,
     })
-    console.log(responseJson);
   }
 
   _getLocationAsync = async () => {
@@ -137,38 +137,40 @@ class HomeScreen extends React.Component {
     }
 
     let location = await Location.getCurrentPositionAsync({});
-    this.setState({ location });
+    let latitude = location.coords.latitude;
+    let longitude = location.coords.longitude;
+    this.setState({ latitude: latitude, longitude: longitude });
+
   };
-  
+
 
   _sendLocationAsync = async () => {
     // user url
-    let url = 'http://oasis-notes.herokuapp.com/locations/'
-    let user_url = await AsyncStorage.getItem('user_url') + '/';
+    let url = 'https://oasis-notes.herokuapp.com/locations/'
+    let user_url = await AsyncStorage.getItem('user_url');
     // token
     let userToken = await AsyncStorage.getItem('userToken');
     let token = 'Token ' + userToken;
     // location
-    let coords = JSON.parse(await AsyncStorage.getItem('coords'));
+    console.log('Sleeping');
+    await new Promise(resolve => setTimeout(resolve, 3000));
     let user_location = {
-      'coords': this.state.location,
+      'coords': this.state.latitude,
       'user': user_url,
     };
-    user_location = JSON.stringify(user_location);
-    console.log(user_location);
-    
-    
+    console.log(JSON.stringify(user_location));
     try {
       const response = await fetch(url, {
         method: 'POST',
         body: JSON.stringify(user_location),
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
           'Authorization': token,
         }
       });
       const json = await response.json();
-      alert('Logged User Location');
+      console.warn('Logged User Location');
     } catch (error) {
       console.error('Error:', error);
     }
